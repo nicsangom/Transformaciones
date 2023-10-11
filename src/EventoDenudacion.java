@@ -1,4 +1,4 @@
-public class EventoDenudacion {
+public class Evento {
 
 	private Integer id;
 	private String titulo;
