@@ -1,19 +1,9 @@
 public class Proceso {
-
-	private String nombre;
+	
 	private Integer id;
+	private String nombre;
 	private String tipo;
 	private String fecha;
-	private String mujer;
-	private String hombre;
-
-	public String getNombre() {
-		return this.nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
 
 	public Integer getId() {
 		return this.id;
@@ -21,6 +11,14 @@ public class Proceso {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getNombre() {
+		return this.nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public String getTipo() {
@@ -37,22 +35,6 @@ public class Proceso {
 
 	public void setFecha(String fecha) {
 		this.fecha = fecha;
-	}
-
-	public String getMujer() {
-		return this.mujer;
-	}
-
-	public void setMujer(String mujer) {
-		this.mujer = mujer;
-	}
-
-	public String getHombre() {
-		return this.hombre;
-	}
-
-	public void setHombre(String hombre) {
-		this.hombre = hombre;
 	}
 
 	// This is a note for getCadena method
