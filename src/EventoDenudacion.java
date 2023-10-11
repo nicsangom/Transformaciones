@@ -6,9 +6,7 @@ public class Evento {
 	private String fecha;
 	private String categoria;
 	private String datos;
-	private String paciente;
-	private String ovocitos;
-
+	
 	public Integer getId() {
 		return this.id;
 	}
@@ -56,21 +54,4 @@ public class Evento {
 	public void setDatos(String datos) {
 		this.datos = datos;
 	}
-
-	public String getPaciente() {
-		return this.paciente;
-	}
-
-	public void setPaciente(String paciente) {
-		this.paciente = paciente;
-	}
-
-	public String getOvocitos() {
-		return this.ovocitos;
-	}
-
-	public void setOvocitos(String ovocitos) {
-		this.ovocitos = ovocitos;
-	}
-
 }
