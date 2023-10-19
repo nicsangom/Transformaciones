@@ -2,48 +2,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class Transformacion1 {
-   
     public static void main(String[] args) throws Exception {
-        
-        List<String> result;
-        String resultado = "";
+        String archivo = "ruta_del_archivo.txt";
+        String urlBaseDatos = "jdbc:mysql://localhost:3306/nombre_base_datos";
+        String usuario = "usuario";   // Sustituir por el usuario
+        String contraseña = "contraseña";   // Sustituir por la contraseña
+        try {
+           List<String> result;
+           String resultado = "";
 
-        //Leer archivos de la carpeta modelos
-        String directorio=args[0]+File.separator+"entrada"+File.separator+"modelos";
-        File modelos = new File(directorio);
-        String[] lista = modelos.list();
+           //Leer archivos de la carpeta modelos
+           String directorio=args[0]+File.separator+"entrada"+File.separator+"modelos";
+           File modelos = new File(directorio);
+           String[] lista = modelos.list();
 
-        //Lee los ficheros que se encuentran en la carpeta modelos
-        for (int i = 0; i < lista.length; i++) {
-            File archivoInterno = new File(directorio + File.separator + lista[i]);
-            directorio=args[0]+File.separator+"entrada"+File.separator+"modelos"+File.separator+archivoInterno.getName();
-        String clase="";
-        List<String> atributos= new ArrayList<>();
+           //Lee los ficheros que se encuentran en la carpeta modelos
+           for (int i = 0; i < lista.length; i++) {
+               File archivoInterno = new File(directorio + File.separator + lista[i]);
+               directorio=args[0]+File.separator+"entrada"+File.separator+"modelos"+File.separator+archivoInterno.getName();
+           String clase="";
+           List<String> atributos= new ArrayList<>();
 
-        try (Stream<String> lines = Files.lines(Paths.get(directorio))) {
+           try (Stream<String> lines = Files.lines(Paths.get(directorio))) {
             result = lines.collect(Collectors.toList());
             for(String line : result){
-                
                 //Obtener nombre de la clase
                 if(line.contains("class")){
                     clase=line.split("class ")[1].split(" ")[0];
                 }
-
                 //Obtener lista de atributos
                 if(line.contains("private")){
                     atributos.add(line.split(" ")[2].substring(0, line.split(" ")[2].length()-1));
                 }
             }
-
             resultado+="\n\n\tasync create"+clase+"(ctx, ";
-            
             for(int atributo=0; atributos.size()-1>=atributo;atributo++){
                 if(atributo<atributos.size()-1){
                     resultado+=atributos.get(atributo)+",";
@@ -115,8 +120,7 @@ public class Transformacion1 {
             } 
 
         }
-    }
-         
+              
         resultado+=resultadoReglas+"\n\t}\n}\n\n";
         resultado+="module.exports ="+args[1]+";";
 
@@ -163,5 +167,40 @@ public class Transformacion1 {
                                  ".js", true));
         writer.println(resultado);
         writer.close();
-     
+
+         // Establecer conexión con la base de datos
+         Connection conexion = DriverManager.getConnection(urlBaseDatos, usuario, contraseña);
+
+         // Preparar la sentencia SQL para insertar los datos
+         String sql = "INSERT INTO tabla (columna1, columna2) VALUES (?, ?)";
+         PreparedStatement statement = conexion.prepareStatement(sql);
+
+         // Leer el archivo línea por línea
+         BufferedReader lector = new BufferedReader(new FileReader(archivo));
+         String linea;
+         while ((linea = lector.readLine()) != null) {
+                // Separar los datos de la línea (suponiendo que están separados por comas)
+                String[] datos = linea.split(",");
+
+                // Asignar los valores a los parámetros de la sentencia SQL
+                statement.setString(1, datos[0]);
+                statement.setString(2, datos[1]);
+
+                // Ejecutar la sentencia SQL
+                statement.executeUpdate();
+         }
+
+         // Cerrar recursos
+         lector.close();
+         statement.close();
+         conexion.close();
+
+         System.out.println("Los datos se han guardado en la base de datos correctamente.");
+        
+           } catch (SQLException e) {
+            System.out.println("Error al conectar con la base de datos: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+        }
+    }
 }
